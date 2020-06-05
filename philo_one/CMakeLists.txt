@@ -1,0 +1,7 @@
+project (philo_one)
+cmake_minimum_required(VERSION 3.17)
+
+aux_source_directory(src VAR)
+
+include_directories(include)
+add_executable(philo_one_cmake ${VAR})
