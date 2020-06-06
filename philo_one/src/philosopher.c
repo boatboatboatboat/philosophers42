@@ -106,6 +106,7 @@ void	*philosopher(t_threadmsg *m)
 	int				forkset[2];
 	unsigned long	last_meal;
 
+	usleep((m->id % 2) * 200);
 	forkset[0] = m->id == 1 ? 1 : m->id - 1;
 	forkset[1] = m->id == 1 ? 0 : m->id % m->sim->thread_count;
 	last_meal = get_time_ms();
@@ -128,6 +129,6 @@ void	*philosopher(t_threadmsg *m)
 		pthread_mutex_lock(&m->meals_lock);
 		m->meals += 1;
 		pthread_mutex_unlock(&m->meals_lock);
-		usleep(500);
+		usleep(100);
 	}
 }
