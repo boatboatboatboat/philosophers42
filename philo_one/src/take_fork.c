@@ -10,18 +10,21 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <unistd.h>
+#include <simulation.h>
+#include <util.h>
 
-int	putstr_unlocked(char *str)
+int		take_fork(
+		t_threadmsg *m,
+		unsigned long last_meal,
+		int forkid)
 {
-	int	len;
-	int	tot;
+	unsigned long	curtime;
 
-	len = 0;
-	tot = 0;
-	while (str[len] != '\0')
-		len += 1;
-	while (tot != len)
-		tot += write(1, str + tot, len - tot);
+	while (fake_trylock(m->sim, forkid))
+	{
+		curtime = get_time_ms();
+		if ((curtime - last_meal) >= m->sim->time_to_die)
+			return (hecking_die(m));
+	}
 	return (0);
 }

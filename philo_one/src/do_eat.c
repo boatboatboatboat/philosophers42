@@ -10,18 +10,23 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <unistd.h>
+#include <simulation.h>
+#include <util.h>
 
-int	putstr_unlocked(char *str)
+int		do_eat(
+		t_threadmsg *m,
+		unsigned long *last_meal)
 {
-	int	len;
-	int	tot;
+	unsigned long	curtime;
 
-	len = 0;
-	tot = 0;
-	while (str[len] != '\0')
-		len += 1;
-	while (tot != len)
-		tot += write(1, str + tot, len - tot);
+	println(m, "is eating\n");
+	*last_meal = get_time_ms();
+	curtime = get_time_ms();
+	while ((curtime - *last_meal) < m->sim->time_to_eat)
+	{
+		if ((curtime - *last_meal) >= m->sim->time_to_die)
+			return (hecking_die(m));
+		curtime = get_time_ms();
+	}
 	return (0);
 }

@@ -10,18 +10,13 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <unistd.h>
+#include <simulation.h>
 
-int	putstr_unlocked(char *str)
+int		hecking_die(t_threadmsg *m)
 {
-	int	len;
-	int	tot;
-
-	len = 0;
-	tot = 0;
-	while (str[len] != '\0')
-		len += 1;
-	while (tot != len)
-		tot += write(1, str + tot, len - tot);
-	return (0);
+	pthread_mutex_lock(&m->sim->killed_lock);
+	m->sim->killed = 1;
+	pthread_mutex_unlock(&m->sim->killed_lock);
+	println_nd(m, "died\n");
+	return (1);
 }

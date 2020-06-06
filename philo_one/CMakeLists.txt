@@ -1,5 +1,5 @@
 project (philo_one)
-cmake_minimum_required(VERSION 3.17)
+cmake_minimum_required(VERSION 3.15)
 
 aux_source_directory(src VAR)
 

@@ -12,7 +12,7 @@
 
 NAME = philo_one
 
-FLAGS_RELEASE = -Wall -Wextra -Werror -O3 -pedantic -lpthread
+FLAGS_RELEASE = -Wall -Wextra -Werror -O3 -pedantic
 
 INCLUDE_DIR = ./include/
 OBJ_DIR = ./obj/
@@ -29,24 +29,26 @@ SRC_FILES =	main \
 			philosopher \
 			println \
 			gettime \
+			fake_trylock \
+			hecking_die \
+			do_eat \
+			do_sleep \
+			drop_forks \
+			take_fork \
 			start_simulation
 
 SRC_FILES := $(SRC_FILES:%=%.o)
 SRC_OBJECTS = $(SRC_FILES:%=%)
+REL_FILES := $(SRC_FILES:%.o=$(SRC_DIR)%.c)
 
 all: $(NAME)
 
-$(NAME): $(SRC_FILES:%=$(OBJ_DIR)%)
-	$(CC)	$^ \
+$(NAME):
+	$(CC)	$(REL_FILES) \
+			-I $(INCLUDE_DIR) \
 			-o $(NAME) \
 			$(FLAGS_RELEASE)
 
-$(OBJ_DIR)%.o: $(SRC_DIR)%.c
-	mkdir -p	$(OBJ_DIR)
-	$(CC)	-I $(INCLUDE_DIR) \
-			-c $^ \
-			-o $@ \
-			$(FLAGS_RELEASE)
 clean:
 	rm -rf	$(SRC_OBJECTS) $(OBJ_DIR) bonus
 
@@ -58,7 +60,7 @@ re: fclean
 
 bonus: all
 
-debug: FLAGS_RELEASE = -Wall -Wextra -Werror -g -pedantic -lpthread
+debug: FLAGS_RELEASE = -Wall -Wextra -Werror -g -pedantic
 debug: all
 
 rdb: clean

@@ -13,7 +13,7 @@
 #include <simulation.h>
 #include <stdlib.h>
 
-int	init_stack_mutex(t_simulation *sim)
+int		init_stack_mutex(t_simulation *sim)
 {
 	if (pthread_mutex_init(&sim->writer_lock, NULL) != 0)
 		return (1);
@@ -25,7 +25,7 @@ int	init_stack_mutex(t_simulation *sim)
 	return (0);
 }
 
-int	init_mutex(t_simulation *sim)
+int		init_mutex(t_simulation *sim)
 {
 	int	i;
 

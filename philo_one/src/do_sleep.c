@@ -10,18 +10,24 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <unistd.h>
+#include <simulation.h>
+#include <util.h>
 
-int	putstr_unlocked(char *str)
+int		do_sleep(
+		t_threadmsg *m,
+		unsigned long last_meal)
 {
-	int	len;
-	int	tot;
+	unsigned long	curtime;
+	unsigned long	sleepstart;
 
-	len = 0;
-	tot = 0;
-	while (str[len] != '\0')
-		len += 1;
-	while (tot != len)
-		tot += write(1, str + tot, len - tot);
+	println(m, "is sleeping\n");
+	curtime = get_time_ms();
+	sleepstart = get_time_ms();
+	while ((curtime - sleepstart) < m->sim->time_to_sleep)
+	{
+		if ((curtime - last_meal) >= m->sim->time_to_die)
+			return (hecking_die(m));
+		curtime = get_time_ms();
+	}
 	return (0);
 }

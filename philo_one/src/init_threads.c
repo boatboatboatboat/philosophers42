@@ -21,7 +21,7 @@ int	init_threads(t_simulation *sim, t_threadmsg *msg)
 	i = 0;
 	while (i < sim->thread_count)
 	{
-		msg[i].sim = sim;;
+		msg[i].sim = sim;
 		msg[i].id = i + 1;
 		msg[i].meals = 0;
 		if (pthread_mutex_init(&msg[i].meals_lock, NULL) != 0)

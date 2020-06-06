@@ -24,4 +24,3 @@ unsigned long	get_time_ms(void)
 	out += (tv.tv_usec / 1000);
 	return (out);
 }
-

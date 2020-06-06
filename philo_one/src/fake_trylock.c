@@ -10,18 +10,19 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <unistd.h>
+#include <simulation.h>
 
-int	putstr_unlocked(char *str)
+int		fake_trylock(t_simulation *sim, int forkid)
 {
-	int	len;
-	int	tot;
+	int	is_busy;
 
-	len = 0;
-	tot = 0;
-	while (str[len] != '\0')
-		len += 1;
-	while (tot != len)
-		tot += write(1, str + tot, len - tot);
-	return (0);
+	is_busy = 1;
+	pthread_mutex_lock(&sim->forks[forkid]);
+	if (sim->real_forks[forkid] == 0)
+	{
+		sim->real_forks[forkid] = 1;
+		is_busy = 0;
+	}
+	pthread_mutex_unlock(&sim->forks[forkid]);
+	return (is_busy);
 }

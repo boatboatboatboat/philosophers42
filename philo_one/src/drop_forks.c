@@ -10,18 +10,14 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <unistd.h>
+#include <simulation.h>
 
-int	putstr_unlocked(char *str)
+void	drop_forks(t_threadmsg *m, const int forkset[2])
 {
-	int	len;
-	int	tot;
-
-	len = 0;
-	tot = 0;
-	while (str[len] != '\0')
-		len += 1;
-	while (tot != len)
-		tot += write(1, str + tot, len - tot);
-	return (0);
+	pthread_mutex_lock(&m->sim->forks[forkset[0]]);
+	pthread_mutex_lock(&m->sim->forks[forkset[1]]);
+	m->sim->real_forks[forkset[0]] = 0;
+	m->sim->real_forks[forkset[1]] = 0;
+	pthread_mutex_unlock(&m->sim->forks[forkset[1]]);
+	pthread_mutex_unlock(&m->sim->forks[forkset[0]]);
 }

@@ -18,7 +18,7 @@ int		main(
 	int argc,
 	char **argv)
 {
-	t_simulation*	sim;
+	t_simulation	*sim;
 
 	sim = malloc(sizeof(t_simulation));
 	if (parse_arguments(sim, argc - 1, argv + 1) != 0)

@@ -17,7 +17,7 @@
 
 static int	number_length(int n)
 {
-	int     tens;
+	int	tens;
 
 	if (n == 0)
 		return (1);
@@ -48,31 +48,31 @@ char		*ft_itoa(unsigned long n, char *out)
 	return (out);
 }
 
-void	println_nd(t_threadmsg *msg, char *str)
+void		println_nd(t_threadmsg *msg, char *str)
 {
 	char			itoabuf[128];
 
 	ft_itoa(get_time_ms() - msg->sim->starttime, itoabuf);
 	pthread_mutex_lock(&msg->sim->writer_lock);
-    putstr_unlocked(itoabuf);
-    putstr_unlocked(" ");
+	putstr_unlocked(itoabuf);
+	putstr_unlocked(" ");
 	ft_itoa(msg->id, itoabuf);
-    putstr_unlocked(itoabuf);
-    putstr_unlocked(" ");
-    putstr_unlocked(str);
+	putstr_unlocked(itoabuf);
+	putstr_unlocked(" ");
+	putstr_unlocked(str);
 }
 
-void	println(t_threadmsg *msg, char *str)
+void		println(t_threadmsg *msg, char *str)
 {
 	char			itoabuf[128];
 
 	ft_itoa(get_time_ms() - msg->sim->starttime, itoabuf);
 	pthread_mutex_lock(&msg->sim->writer_lock);
-    putstr_unlocked(itoabuf);
-    putstr_unlocked(" ");
+	putstr_unlocked(itoabuf);
+	putstr_unlocked(" ");
 	ft_itoa(msg->id, itoabuf);
-    putstr_unlocked(itoabuf);
-    putstr_unlocked(" ");
-    putstr_unlocked(str);
+	putstr_unlocked(itoabuf);
+	putstr_unlocked(" ");
+	putstr_unlocked(str);
 	pthread_mutex_unlock(&msg->sim->writer_lock);
 }

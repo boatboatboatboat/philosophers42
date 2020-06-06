@@ -30,6 +30,8 @@ typedef struct		s_simulation
 	useconds_t		time_to_die;
 	useconds_t		time_to_eat;
 	useconds_t		time_to_sleep;
+	int				gprio;
+	pthread_mutex_t gprio_lock;
 }					t_simulation;
 
 typedef struct		s_threadmsg
@@ -40,18 +42,31 @@ typedef struct		s_threadmsg
 	pthread_mutex_t	meals_lock;
 }					t_threadmsg;
 
-int		parse_arguments(
+int					parse_arguments(
 	t_simulation *sim,
 	int argc,
 	char **argv);
-int		start_simulation(t_simulation *sim);
-int		init_mutex(t_simulation *sim);
-int		init_stack_mutex(t_simulation *sim);
-void	destroy_mutex(t_simulation *sim);
-int		init_threads(t_simulation *sim, t_threadmsg *msg);
-void	*philosopher(t_threadmsg *info);
-void	println(t_threadmsg *msg, char *str);
-void	println_nd(t_threadmsg *msg, char *str);
-int		not_bzero(int *a, int l);
+int					start_simulation(t_simulation *sim);
+int					init_mutex(t_simulation *sim);
+int					init_stack_mutex(t_simulation *sim);
+void				destroy_mutex(t_simulation *sim);
+int					init_threads(t_simulation *sim, t_threadmsg *msg);
+void				*philosopher(t_threadmsg *info);
+void				println(t_threadmsg *msg, char *str);
+void				println_nd(t_threadmsg *msg, char *str);
+int					not_bzero(int *a, int l);
+int					fake_trylock(t_simulation *sim, int forkid);
+int					hecking_die(t_threadmsg *m);
+void				drop_forks(t_threadmsg *m, const int forkset[2]);
+int					do_eat(
+		t_threadmsg *m,
+		unsigned long *last_meal);
+int					do_sleep(
+		t_threadmsg *m,
+		unsigned long last_meal);
+int					take_fork(
+		t_threadmsg *m,
+		unsigned long last_meal,
+		int forkid);
 
 #endif
