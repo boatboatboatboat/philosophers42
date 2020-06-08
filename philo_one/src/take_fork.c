@@ -20,7 +20,7 @@ int		take_fork(
 {
 	unsigned long	curtime;
 
-	while (fake_trylock(m->sim, forkid))
+	while (fake_trylock(m, forkid))
 	{
 		curtime = get_time_ms();
 		if ((curtime - last_meal) >= m->sim->time_to_die)

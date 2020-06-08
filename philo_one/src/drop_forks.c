@@ -16,8 +16,8 @@ void	drop_forks(t_threadmsg *m, const int forkset[2])
 {
 	pthread_mutex_lock(&m->sim->forks[forkset[0]]);
 	pthread_mutex_lock(&m->sim->forks[forkset[1]]);
-	m->sim->real_forks[forkset[0]] = 0;
-	m->sim->real_forks[forkset[1]] = 0;
+	m->sim->real_forks[forkset[0]] = -m->id;
+	m->sim->real_forks[forkset[1]] = -m->id;
 	pthread_mutex_unlock(&m->sim->forks[forkset[1]]);
 	pthread_mutex_unlock(&m->sim->forks[forkset[0]]);
 }

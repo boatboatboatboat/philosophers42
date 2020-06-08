@@ -51,21 +51,16 @@ static void	run_simulation(t_simulation *sim, t_threadmsg *tmsg)
 		pthread_mutex_unlock(&sim->killed_lock);
 		i[0] = 0;
 		i[1] = 0;
-		i[2] = 0;
 		while (i[0] < sim->thread_count)
 		{
 			pthread_mutex_lock(&tmsg[i[0]].meals_lock);
 			if (tmsg->meals >= sim->meals_required)
 				i[1] += 1;
-			i[2] += tmsg->meals;
 			pthread_mutex_unlock(&tmsg[i[0]].meals_lock);
 			i[0] += 1;
 		}
 		if (sim->meals_required >= 0 && i[1] == sim->thread_count)
 			break ;
-		pthread_mutex_lock(&sim->gprio_lock);
-		sim->gprio = i[2] / sim->thread_count;
-		pthread_mutex_unlock(&sim->gprio_lock);
 	}
 }
 

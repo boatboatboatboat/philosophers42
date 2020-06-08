@@ -12,7 +12,7 @@
 
 NAME = philo_one
 
-FLAGS_RELEASE = -Wall -Wextra -Werror -O3 -pedantic
+FLAGS_RELEASE = -Wall -Wextra -Werror -O3 -pedantic -lpthread
 
 INCLUDE_DIR = ./include/
 OBJ_DIR = ./obj/
@@ -60,7 +60,7 @@ re: fclean
 
 bonus: all
 
-debug: FLAGS_RELEASE = -Wall -Wextra -Werror -g -pedantic
+debug: FLAGS_RELEASE = -Wall -Wextra -Werror -g -pedantic -lpthread
 debug: all
 
 rdb: clean

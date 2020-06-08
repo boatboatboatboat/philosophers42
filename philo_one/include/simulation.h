@@ -30,11 +30,9 @@ typedef struct		s_simulation
 	useconds_t		time_to_die;
 	useconds_t		time_to_eat;
 	useconds_t		time_to_sleep;
-	int				gprio;
-	pthread_mutex_t gprio_lock;
 }					t_simulation;
 
-typedef struct		s_threadmsg
+typedef struct		i9ts_threadmsg
 {
 	t_simulation	*sim;
 	int				id;
@@ -55,7 +53,7 @@ void				*philosopher(t_threadmsg *info);
 void				println(t_threadmsg *msg, char *str);
 void				println_nd(t_threadmsg *msg, char *str);
 int					not_bzero(int *a, int l);
-int					fake_trylock(t_simulation *sim, int forkid);
+int					fake_trylock(t_threadmsg *m, int forkid);
 int					hecking_die(t_threadmsg *m);
 void				drop_forks(t_threadmsg *m, const int forkset[2]);
 int					do_eat(

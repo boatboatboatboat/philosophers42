@@ -1,0 +1,4 @@
+/usr/bin/cmake -DCMAKE_BUILD_TYPE=Debug -G "CodeBlocks - Unix Makefiles" /home/boat/codam/philosophers/philo_one
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /home/boat/codam/philosophers/philo_one/cmake-build-debug

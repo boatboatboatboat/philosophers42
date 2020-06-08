@@ -12,17 +12,18 @@
 
 #include <simulation.h>
 
-int		fake_trylock(t_simulation *sim, int forkid)
+int		fake_trylock(t_threadmsg *m, int forkid)
 {
 	int	is_busy;
 
 	is_busy = 1;
-	pthread_mutex_lock(&sim->forks[forkid]);
-	if (sim->real_forks[forkid] == 0)
+	pthread_mutex_lock(&m->sim->forks[forkid]);
+	if (m->sim->thread_count == 1 || (m->sim->real_forks[forkid] < 0
+		&& m->sim->real_forks[forkid] != -m->id))
 	{
-		sim->real_forks[forkid] = 1;
+		m->sim->real_forks[forkid] = m->id;
 		is_busy = 0;
 	}
-	pthread_mutex_unlock(&sim->forks[forkid]);
+	pthread_mutex_unlock(&m->sim->forks[forkid]);
 	return (is_busy);
 }
