@@ -32,12 +32,14 @@ typedef struct		s_simulation
 	useconds_t		time_to_sleep;
 }					t_simulation;
 
-typedef struct		i9ts_threadmsg
+typedef struct		s_threadmsg
 {
 	t_simulation	*sim;
 	int				id;
 	int				meals;
 	pthread_mutex_t	meals_lock;
+	unsigned long	last_meal;
+	pthread_mutex_t	last_meal_lock;
 }					t_threadmsg;
 
 int					parse_arguments(

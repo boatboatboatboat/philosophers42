@@ -12,14 +12,10 @@
 
 int		not_bzero(int *a, int l)
 {
-	int	fl;
-
-	fl = l;
 	while (l > 0)
 	{
 		l -= 1;
 		a[l] = -(l - (l % 2) + 1);
 	}
-	a[fl] = -1;
 	return (0);
 }

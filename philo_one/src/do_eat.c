@@ -23,10 +23,6 @@ int		do_eat(
 	*last_meal = get_time_ms();
 	curtime = get_time_ms();
 	while ((curtime - *last_meal) < m->sim->time_to_eat)
-	{
-		if ((curtime - *last_meal) >= m->sim->time_to_die)
-			return (hecking_die(m));
-		curtime = get_time_ms();
-	}
+		continue ;
 	return (0);
 }

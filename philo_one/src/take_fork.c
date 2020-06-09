@@ -18,13 +18,9 @@ int		take_fork(
 		unsigned long last_meal,
 		int forkid)
 {
-	unsigned long	curtime;
+	(void)last_meal;
 
 	while (fake_trylock(m, forkid))
-	{
-		curtime = get_time_ms();
-		if ((curtime - last_meal) >= m->sim->time_to_die)
-			return (hecking_die(m));
-	}
+		continue ;
 	return (0);
 }

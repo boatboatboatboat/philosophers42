@@ -60,10 +60,10 @@ re: fclean
 
 bonus: all
 
-debug: FLAGS_RELEASE = -Wall -Wextra -Werror -g -pedantic -lpthread
+debug: FLAGS_RELEASE = -Wall -Wextra -Werror -g -pedantic -lpthread -fsanitize=address
 debug: all
 
-rdb: clean
+rdb: fclean
 	$(MAKE) debug
 
 rb:

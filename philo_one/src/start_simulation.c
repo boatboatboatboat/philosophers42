@@ -39,17 +39,16 @@ static int	init_simulation(t_simulation *sim, t_threadmsg *tmsg)
 	return (0);
 }
 
-static void	run_simulation(t_simulation *sim, t_threadmsg *tmsg)
+void	run_simulation(t_simulation *sim)
 {
-	int	i[3];
-
 	while (1)
 	{
 		pthread_mutex_lock(&sim->killed_lock);
 		if (sim->killed)
 			break ;
 		pthread_mutex_unlock(&sim->killed_lock);
-		i[0] = 0;
+		usleep(500);
+/*		i[0] = 0;
 		i[1] = 0;
 		while (i[0] < sim->thread_count)
 		{
@@ -57,10 +56,49 @@ static void	run_simulation(t_simulation *sim, t_threadmsg *tmsg)
 			if (tmsg->meals >= sim->meals_required)
 				i[1] += 1;
 			pthread_mutex_unlock(&tmsg[i[0]].meals_lock);
+			pthread_mutex_lock(&tmsg[i[0]].last_meal_lock);
+			if ((get_time_ms() - tmsg[i[0]].last_meal) > sim->time_to_die)
+			{
+				println_nd(tmsg, "fucking died\n");
+				return ;
+			}
+			pthread_mutex_unlock(&tmsg[i[0]].last_meal_lock);
 			i[0] += 1;
 		}
 		if (sim->meals_required >= 0 && i[1] == sim->thread_count)
 			break ;
+*/
+	}
+}
+
+void	*fuck(t_threadmsg *msg)
+{
+	while (1)
+	{
+		pthread_mutex_lock(&msg->last_meal_lock);
+		if ((get_time_ms() - msg->last_meal) >= msg->sim->time_to_die)
+		{
+			println_nd(msg, "fucking died\n");
+			pthread_mutex_lock(&msg->sim->killed_lock);
+			msg->sim->killed = 1;
+			pthread_mutex_unlock(&msg->sim->killed_lock);
+			return (NULL);
+		}
+		pthread_mutex_unlock(&msg->last_meal_lock);
+		usleep(500);
+	}
+}
+
+void		start_ihandlers(t_threadmsg *msg)
+{
+	int i;
+	pthread_t	some_thread[420];
+
+	i = 0;
+	while (i < msg->sim->thread_count)
+	{
+		pthread_create(&some_thread[i], NULL, (void *(*)(void *)) fuck, msg);
+		i += 1;
 	}
 }
 
@@ -76,7 +114,8 @@ int			start_simulation(t_simulation *sim)
 		return (1);
 	}
 	sim->killed = 0;
-	run_simulation(sim, tmsg);
+	start_ihandlers(tmsg);
+	run_simulation(sim);
 	usleep(1010);
 	return (0);
 }
