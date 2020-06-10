@@ -24,3 +24,15 @@ unsigned long	get_time_ms(void)
 	out += (tv.tv_usec / 1000);
 	return (out);
 }
+
+unsigned long	get_time_us(void)
+{
+	struct timeval	tv;
+	unsigned long	out;
+
+	gettimeofday(&tv, NULL);
+	out = tv.tv_sec;
+	out *= 1000 * 1000;
+	out += tv.tv_usec;
+	return (out);
+}

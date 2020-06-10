@@ -15,11 +15,8 @@
 
 int		take_fork(
 		t_threadmsg *m,
-		unsigned long last_meal,
 		int forkid)
 {
-	(void)last_meal;
-
 	while (fake_trylock(m, forkid))
 		continue ;
 	return (0);

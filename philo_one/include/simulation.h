@@ -37,9 +37,8 @@ typedef struct		s_threadmsg
 	t_simulation	*sim;
 	int				id;
 	int				meals;
-	pthread_mutex_t	meals_lock;
 	unsigned long	last_meal;
-	pthread_mutex_t	last_meal_lock;
+	pthread_mutex_t	meal_lock;
 }					t_threadmsg;
 
 int					parse_arguments(
@@ -66,7 +65,6 @@ int					do_sleep(
 		unsigned long last_meal);
 int					take_fork(
 		t_threadmsg *m,
-		unsigned long last_meal,
 		int forkid);
 
 #endif

@@ -39,67 +39,67 @@ static int	init_simulation(t_simulation *sim, t_threadmsg *tmsg)
 	return (0);
 }
 
-void	run_simulation(t_simulation *sim)
+void		run_simulation(t_simulation *sim, t_threadmsg *msg)
 {
+	unsigned long	i[2];
+
 	while (1)
 	{
 		pthread_mutex_lock(&sim->killed_lock);
 		if (sim->killed)
 			break ;
 		pthread_mutex_unlock(&sim->killed_lock);
-		usleep(500);
-/*		i[0] = 0;
-		i[1] = 0;
-		while (i[0] < sim->thread_count)
+		i[0] = 0;
+		i[1] = 1;
+		while (i[0] < (unsigned long)sim->thread_count)
 		{
-			pthread_mutex_lock(&tmsg[i[0]].meals_lock);
-			if (tmsg->meals >= sim->meals_required)
-				i[1] += 1;
-			pthread_mutex_unlock(&tmsg[i[0]].meals_lock);
-			pthread_mutex_lock(&tmsg[i[0]].last_meal_lock);
-			if ((get_time_ms() - tmsg[i[0]].last_meal) > sim->time_to_die)
-			{
-				println_nd(tmsg, "fucking died\n");
-				return ;
-			}
-			pthread_mutex_unlock(&tmsg[i[0]].last_meal_lock);
+			pthread_mutex_lock(&msg[i[0]].meal_lock);
+			i[1] += msg[i[0]].meals;
+			pthread_mutex_unlock(&msg[i[0]].meal_lock);
 			i[0] += 1;
 		}
-		if (sim->meals_required >= 0 && i[1] == sim->thread_count)
+		if (sim->meals_required >= 0 && (i[1] / sim->thread_count) >=
+			(unsigned long)sim->meals_required)
+		{
+			pthread_mutex_lock(&sim->writer_lock);
 			break ;
-*/
+		}
+		usleep(500);
 	}
 }
 
-void	*fuck(t_threadmsg *msg)
+void		*ihandler(t_threadmsg *msg)
 {
 	while (1)
 	{
-		pthread_mutex_lock(&msg->last_meal_lock);
+		pthread_mutex_lock(&msg->meal_lock);
 		if ((get_time_ms() - msg->last_meal) >= msg->sim->time_to_die)
 		{
-			println_nd(msg, "fucking died\n");
+			println_nd(msg, "died\n");
 			pthread_mutex_lock(&msg->sim->killed_lock);
 			msg->sim->killed = 1;
 			pthread_mutex_unlock(&msg->sim->killed_lock);
 			return (NULL);
 		}
-		pthread_mutex_unlock(&msg->last_meal_lock);
-		usleep(500);
+		pthread_mutex_unlock(&msg->meal_lock);
+		usleep(100);
 	}
 }
 
-void		start_ihandlers(t_threadmsg *msg)
+int			start_ihandlers(t_threadmsg *msg)
 {
-	int i;
-	pthread_t	some_thread[420];
+	int			i;
+	pthread_t	some_thread;
 
 	i = 0;
 	while (i < msg->sim->thread_count)
 	{
-		pthread_create(&some_thread[i], NULL, (void *(*)(void *)) fuck, msg);
+		if (pthread_create(&some_thread, NULL,
+				(void *(*)(void *)) ihandler, msg) != 0)
+			return (1);
 		i += 1;
 	}
+	return (0);
 }
 
 int			start_simulation(t_simulation *sim)
@@ -115,7 +115,7 @@ int			start_simulation(t_simulation *sim)
 	}
 	sim->killed = 0;
 	start_ihandlers(tmsg);
-	run_simulation(sim);
+	run_simulation(sim, tmsg);
 	usleep(1010);
 	return (0);
 }

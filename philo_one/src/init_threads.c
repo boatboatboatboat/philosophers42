@@ -14,42 +14,65 @@
 #include <util.h>
 #include <stdlib.h>
 
-int	init_threads(t_simulation *sim, t_threadmsg *msg)
+static int	init_messages(t_simulation *sim, t_threadmsg *msg)
 {
-	int	i;
+	int	idx;
+	int	failed;
+
+	idx = 0;
+	failed = 0;
+	while (idx < sim->thread_count)
+	{
+		msg[idx].sim = sim;
+		msg[idx].id = idx + 1;
+		msg[idx].meals = 0;
+		msg[idx].last_meal = get_time_ms();
+		if (pthread_mutex_init(&msg[idx].meal_lock, NULL) != 0)
+		{
+			failed = 1;
+			break ;
+		}
+		idx += 1;
+	}
+	while (failed && idx > 0)
+	{
+		idx -= 1;
+		pthread_mutex_destroy(&msg[idx].meal_lock);
+	}
+	return (failed);
+}
+
+static int	create_threads(t_simulation *sim, t_threadmsg *msg)
+{
+	int	idx;
 	int	fail;
 
-	sim->threads = malloc(sizeof(pthread_t) * sim->thread_count);
-	i = 0;
+	idx = 0;
 	fail = 0;
-	while (i < sim->thread_count)
+	while (idx < sim->thread_count)
 	{
-		msg[i].sim = sim;
-		msg[i].id = i + 1;
-		msg[i].meals = 0;
-		msg[i].last_meal = get_time_ms();
-		if (pthread_mutex_init(&msg[i].meals_lock, NULL) != 0)
+		if (pthread_create(&sim->threads[idx], NULL,
+				(void *(*)(void *)) &philosopher, &msg[idx]) != 0)
 		{
 			fail = 1;
 			break ;
 		}
-		if (pthread_mutex_init(&msg[i].last_meal_lock, NULL) != 0)
-		{
-			fail = 1;
-			break ;
-		}
-		i += 1;
-	}
-	while (i > 0)
-	{
-		i -= 1;
-		if (pthread_create(&sim->threads[i], NULL,
-				(void *(*)(void *)) &philosopher, &msg[i]) != 0)
-		{
-			pthread_mutex_destroy(&msg[i].meals_lock);
-			fail = 1;
-			break ;
-		}
+		idx += 1;
 	}
 	return (fail);
+}
+
+int			init_threads(t_simulation *sim, t_threadmsg *msg)
+{
+	sim->threads = malloc(sizeof(pthread_t) * sim->thread_count);
+	if (sim->threads == NULL)
+		return (1);
+	if (init_messages(sim, msg) != 0)
+	{
+		free(sim->threads);
+		return (1);
+	}
+	if (create_threads(sim, msg) != 0)
+		return (1);
+	return (0);
 }

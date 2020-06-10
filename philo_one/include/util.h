@@ -18,5 +18,6 @@ int				not_atoi(char *str, int *result);
 int				not_atoui(char *str, unsigned int *result);
 int				not_isdigit(char c);
 int				putstr_unlocked(char *str);
+unsigned long	get_time_us(void);
 
 #endif

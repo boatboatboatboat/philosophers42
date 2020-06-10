@@ -16,14 +16,14 @@
 #include <stddef.h>
 #include <stdio.h>
 
-static void	increase_meal(t_threadmsg *m)
+static void	stupid_sleep(unsigned long ms)
 {
-	if (m->sim->meals_required >= 0)
-	{
-		pthread_mutex_lock(&m->meals_lock);
-		m->meals += 1;
-		pthread_mutex_unlock(&m->meals_lock);
-	}
+	unsigned long	entry;
+
+	entry = get_time_us();
+	ms *= 1000;
+	while ((get_time_us() - entry) < ms)
+		usleep(100);
 }
 
 void		*philosopher(t_threadmsg *m)
@@ -33,24 +33,21 @@ void		*philosopher(t_threadmsg *m)
 
 	forkset[0] = m->id == 1 ? 1 : m->id - 1;
 	forkset[1] = m->id == 1 ? 0 : m->id % m->sim->thread_count;
-	last_meal = get_time_ms();
 	while (1)
 	{
 		println(m, "is thinking\n");
-		take_fork(m, 0, forkset[0]);
+		take_fork(m, forkset[0]);
 		println(m, "has taken a fork\n");
-		take_fork(m, 0, forkset[1]);
+		take_fork(m, forkset[1]);
 		println(m, "is eating\n");
 		last_meal = get_time_ms();
-		pthread_mutex_lock(&m->last_meal_lock);
+		pthread_mutex_lock(&m->meal_lock);
 		m->last_meal = last_meal;
-		pthread_mutex_unlock(&m->last_meal_lock);
-		usleep(m->sim->time_to_eat * 1000);
+		m->meals += 1;
+		pthread_mutex_unlock(&m->meal_lock);
+		stupid_sleep(m->sim->time_to_eat);
 		drop_forks(m, forkset);
 		println(m, "is sleeping\n");
-		increase_meal(m);
-		usleep(m->sim->time_to_sleep * 1000);
-		if (m->sim->time_to_sleep == 12345678)
-			return (NULL);
+		stupid_sleep(m->sim->time_to_sleep);
 	}
 }
