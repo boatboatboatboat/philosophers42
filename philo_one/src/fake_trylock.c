@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #include <simulation.h>
+#include <stdio.h>
 
 int		fake_trylock(t_threadmsg *m, int forkid)
 {

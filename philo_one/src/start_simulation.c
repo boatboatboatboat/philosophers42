@@ -50,16 +50,15 @@ void		run_simulation(t_simulation *sim, t_threadmsg *msg)
 			break ;
 		pthread_mutex_unlock(&sim->killed_lock);
 		i[0] = 0;
-		i[1] = 1;
+		i[1] = 0;
 		while (i[0] < (unsigned long)sim->thread_count)
 		{
 			pthread_mutex_lock(&msg[i[0]].meal_lock);
-			i[1] += msg[i[0]].meals;
+			i[1] += msg[i[0]].meals >= sim->meals_required;
 			pthread_mutex_unlock(&msg[i[0]].meal_lock);
 			i[0] += 1;
 		}
-		if (sim->meals_required >= 0 && (i[1] / sim->thread_count) >=
-			(unsigned long)sim->meals_required)
+		if (sim->meals_required >= 0 && i[1] == (unsigned long)sim->thread_count)
 		{
 			pthread_mutex_lock(&sim->writer_lock);
 			break ;
@@ -73,9 +72,9 @@ void		*ihandler(t_threadmsg *msg)
 	while (1)
 	{
 		pthread_mutex_lock(&msg->meal_lock);
-		if ((get_time_ms() - msg->last_meal) >= msg->sim->time_to_die)
+        if ((get_time_ms() - msg->last_meal) >= msg->sim->time_to_die)
 		{
-			println_nd(msg, "died\n");
+            println_nd(msg, "died\n");
 			pthread_mutex_lock(&msg->sim->killed_lock);
 			msg->sim->killed = 1;
 			pthread_mutex_unlock(&msg->sim->killed_lock);
@@ -95,7 +94,7 @@ int			start_ihandlers(t_threadmsg *msg)
 	while (i < msg->sim->thread_count)
 	{
 		if (pthread_create(&some_thread, NULL,
-				(void *(*)(void *)) ihandler, msg) != 0)
+				(void *(*)(void *)) ihandler, &msg[i]) != 0)
 			return (1);
 		i += 1;
 	}
