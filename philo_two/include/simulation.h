@@ -15,15 +15,15 @@
 
 # include <pthread.h>
 # include <unistd.h>
+# include <semaphore.h>
 
 typedef struct		s_simulation
 {
 	pthread_t		*threads;
-	pthread_mutex_t	writer_lock;
-	pthread_mutex_t	killed_lock;
-	pthread_mutex_t	dead_lock;
-	pthread_mutex_t	*forks;
-	int				*real_forks;
+	sem_t			*writer_lock;
+	sem_t			*killed_lock;
+	sem_t			*dead_lock;
+	sem_t			*forks;
 	int				thread_count;
 	int				meals_required;
 	int				killed;
@@ -39,7 +39,7 @@ typedef struct		s_threadmsg
 	int				id;
 	int				meals;
 	unsigned long	last_meal;
-	pthread_mutex_t	meal_lock;
+	sem_t			*meal_lock;
 }					t_threadmsg;
 
 int					parse_arguments(
@@ -57,8 +57,7 @@ void				println_nd(t_threadmsg *msg, char *str);
 int					not_bzero(int *a, int l);
 int					fake_trylock(t_threadmsg *m, int forkid);
 int					hecking_die(t_threadmsg *m);
-void				drop_forks(t_threadmsg *m, const int forkset[2]);
-void				dead_lock(t_threadmsg *m);
+void				drop_forks(t_threadmsg *m);
 int					do_eat(
 		t_threadmsg *m,
 		unsigned long *last_meal);
@@ -66,7 +65,7 @@ int					do_sleep(
 		t_threadmsg *m,
 		unsigned long last_meal);
 int					take_fork(
-		t_threadmsg *m,
-		int forkid);
+		t_threadmsg *m);
+void		dead_lock(t_threadmsg *m);
 
 #endif

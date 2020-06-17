@@ -10,22 +10,30 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <simulation.h>
-#include <stdio.h>
+#include <util.h>
 
-int		fake_trylock(t_threadmsg *m, int forkid)
+int	not_atoi(char *argv, int *result)
 {
-	int	is_busy;
+	int	num;
 
-	is_busy = 1;
-	dead_lock(m);
-	pthread_mutex_lock(&m->sim->forks[forkid]);
-	if (m->sim->thread_count == 1 || (m->sim->real_forks[forkid] < 0
-		&& m->sim->real_forks[forkid] != -m->id))
+	num = 0;
+	while (not_isdigit(*argv))
 	{
-		m->sim->real_forks[forkid] = m->id;
-		is_busy = 0;
+		num *= 10;
+		num += *argv - '0';
+		argv += 1;
 	}
-	pthread_mutex_unlock(&m->sim->forks[forkid]);
-	return (is_busy);
+	if (*argv == '\0')
+		*result = num;
+	return (*argv != '\0');
+}
+
+int	not_atoui(char *argv, unsigned int *result)
+{
+	int	x;
+
+	if (not_atoi(argv, &x))
+		return (1);
+	*result = (unsigned int)x;
+	return (0);
 }

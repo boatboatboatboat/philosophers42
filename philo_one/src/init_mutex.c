@@ -22,6 +22,12 @@ int		init_stack_mutex(t_simulation *sim)
 		pthread_mutex_destroy(&sim->writer_lock);
 		return (1);
 	}
+	if (pthread_mutex_init(&sim->dead_lock, NULL) != 0)
+	{
+		pthread_mutex_destroy(&sim->writer_lock);
+		pthread_mutex_destroy(&sim->killed_lock);
+		return (1);
+	}
 	return (0);
 }
 

@@ -11,21 +11,23 @@
 /* ************************************************************************** */
 
 #include <simulation.h>
-#include <stdio.h>
+#include <util.h>
 
-int		fake_trylock(t_threadmsg *m, int forkid)
+int		do_sleep(
+		t_threadmsg *m,
+		unsigned long last_meal)
 {
-	int	is_busy;
+	unsigned long	curtime;
+	unsigned long	sleepstart;
 
-	is_busy = 1;
-	dead_lock(m);
-	pthread_mutex_lock(&m->sim->forks[forkid]);
-	if (m->sim->thread_count == 1 || (m->sim->real_forks[forkid] < 0
-		&& m->sim->real_forks[forkid] != -m->id))
+	println(m, "is sleeping\n");
+	curtime = get_time_ms();
+	sleepstart = get_time_ms();
+	while ((curtime - sleepstart) < m->sim->time_to_sleep)
 	{
-		m->sim->real_forks[forkid] = m->id;
-		is_busy = 0;
+		if ((curtime - last_meal) >= m->sim->time_to_die)
+			return (hecking_die(m));
+		curtime = get_time_ms();
 	}
-	pthread_mutex_unlock(&m->sim->forks[forkid]);
-	return (is_busy);
+	return (0);
 }

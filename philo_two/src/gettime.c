@@ -10,22 +10,29 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <simulation.h>
-#include <stdio.h>
+#include <sys/time.h>
+#include <stddef.h>
 
-int		fake_trylock(t_threadmsg *m, int forkid)
+unsigned long	get_time_ms(void)
 {
-	int	is_busy;
+	struct timeval	tv;
+	unsigned long	out;
 
-	is_busy = 1;
-	dead_lock(m);
-	pthread_mutex_lock(&m->sim->forks[forkid]);
-	if (m->sim->thread_count == 1 || (m->sim->real_forks[forkid] < 0
-		&& m->sim->real_forks[forkid] != -m->id))
-	{
-		m->sim->real_forks[forkid] = m->id;
-		is_busy = 0;
-	}
-	pthread_mutex_unlock(&m->sim->forks[forkid]);
-	return (is_busy);
+	gettimeofday(&tv, NULL);
+	out = tv.tv_sec;
+	out *= 1000;
+	out += (tv.tv_usec / 1000);
+	return (out);
+}
+
+unsigned long	get_time_us(void)
+{
+	struct timeval	tv;
+	unsigned long	out;
+
+	gettimeofday(&tv, NULL);
+	out = tv.tv_sec;
+	out *= 1000 * 1000;
+	out += tv.tv_usec;
+	return (out);
 }

@@ -18,22 +18,21 @@
 static int	init_simulation(t_simulation *sim, t_threadmsg *tmsg)
 {
 	sim->starttime = get_time_ms();
-	sim->real_forks = malloc(sizeof(int) * sim->thread_count);
-	if (sim->real_forks == NULL)
-		return (putstr_unlocked("failed to create real forks\n"));
-	not_bzero(sim->real_forks, sim->thread_count);
-	if (init_mutex(sim) != 0)
-		return (putstr_unlocked("mutex creation failed\n"));
+	sem_unlink("/philoforks");
+	sim->forks = sem_open("/philoforks", O_CREAT | O_TRUNC, S_IRWXU | S_IRWXO, sim->thread_count);
+	if (sim->forks == NULL)
+		return (putstr_unlocked("failed to create forks\n"));
+	/*if (init_mutex(sim) != 0)
+		return (putstr_unlocked("mutex creation failed\n"));*/
 	if (init_stack_mutex(sim) != 0)
 	{
-		destroy_mutex(sim);
+		/*destroy_mutex(sim);*/
 		return (putstr_unlocked("stack mutex creation failed\n"));
 	}
 	if (init_threads(sim, tmsg) != 0)
 	{
-		pthread_mutex_destroy(&sim->writer_lock);
-		pthread_mutex_destroy(&sim->killed_lock);
-		destroy_mutex(sim);
+		/* Destroy Semaphores! */
+		/* destroy_mutex(sim); */
 		return (putstr_unlocked("thread init failed\n"));
 	}
 	return (0);
@@ -43,26 +42,25 @@ void		run_simulation(t_simulation *sim, t_threadmsg *msg)
 {
 	unsigned long	i[2];
 
-	pthread_mutex_lock(&sim->dead_lock);
 	while (1)
 	{
-		pthread_mutex_lock(&sim->killed_lock);
+		sem_wait(sim->killed_lock);
 		if (sim->killed)
 			break ;
-		pthread_mutex_unlock(&sim->killed_lock);
+		sem_post(sim->killed_lock);
 		i[0] = 0;
 		i[1] = 0;
 		while (i[0] < (unsigned long)sim->thread_count)
 		{
-			pthread_mutex_lock(&msg[i[0]].meal_lock);
+			sem_wait(msg[i[0]].meal_lock);
 			i[1] += msg[i[0]].meals >= sim->meals_required;
-			pthread_mutex_unlock(&msg[i[0]].meal_lock);
+			sem_post(msg[i[0]].meal_lock);
 			i[0] += 1;
 		}
 		if (sim->meals_required >= 0
 			&& i[1] == (unsigned long)sim->thread_count)
 		{
-			pthread_mutex_lock(&sim->writer_lock);
+			sem_wait(sim->writer_lock);
 			break ;
 		}
 		usleep(500);
@@ -73,17 +71,17 @@ void		*ihandler(t_threadmsg *msg)
 {
 	while (1)
 	{
-		pthread_mutex_lock(&msg->meal_lock);
+		sem_wait(msg->meal_lock);
 		if ((get_time_ms() - msg->last_meal) >= msg->sim->time_to_die)
 		{
-			pthread_mutex_unlock(&msg->meal_lock);
+			sem_post(msg->meal_lock);
 			println_nd(msg, "died\n");
-			pthread_mutex_lock(&msg->sim->killed_lock);
+			sem_wait(msg->sim->killed_lock);
 			msg->sim->killed = 1;
-			pthread_mutex_unlock(&msg->sim->killed_lock);
+			sem_post(msg->sim->killed_lock);
 			return (NULL);
 		}
-		pthread_mutex_unlock(&msg->meal_lock);
+		sem_post(msg->meal_lock);
 		usleep(100);
 	}
 }
@@ -112,7 +110,7 @@ int			start_simulation(t_simulation *sim)
 	if (init_simulation(sim, tmsg) != 0)
 	{
 		free(tmsg);
-		free(sim->real_forks);
+		/* free(sim->real_forks); dtor sem */
 		return (1);
 	}
 	sim->killed = 0;

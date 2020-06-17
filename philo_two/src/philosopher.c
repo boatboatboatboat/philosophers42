@@ -30,11 +30,11 @@ void		dead_lock(t_threadmsg *m)
 {
 	int	dead;
 
-	pthread_mutex_lock(&m->sim->killed_lock);
+	sem_wait(m->sim->killed_lock);
 	dead = m->sim->killed;
-	pthread_mutex_unlock(&m->sim->killed_lock);
+	sem_post(m->sim->killed_lock);
 	if (dead)
-		pthread_mutex_lock(&m->sim->dead_lock);
+		sem_wait(m->sim->dead_lock);
 }
 
 void		*philosopher(t_threadmsg *m)
@@ -44,21 +44,23 @@ void		*philosopher(t_threadmsg *m)
 
 	forkset[0] = m->id == 1 ? 1 : m->id - 1;
 	forkset[1] = m->id == 1 ? 0 : m->id % m->sim->thread_count;
+	usleep((m->id % 2) * 100);
 	while (1)
 	{
 		println(m, "is thinking\n");
-		take_fork(m, forkset[0]);
+		take_fork(m);
 		println(m, "has taken a fork\n");
-		take_fork(m, forkset[1]);
+		take_fork(m);
 		println(m, "is eating\n");
 		last_meal = get_time_ms();
-		pthread_mutex_lock(&m->meal_lock);
+		dead_lock(m);
+		sem_wait(m->meal_lock);
 		m->last_meal = last_meal;
 		m->meals += 1;
-		pthread_mutex_unlock(&m->meal_lock);
-		stupid_sleep(m->sim->time_to_eat);
 		dead_lock(m);
-		drop_forks(m, forkset);
+		sem_post(m->meal_lock);
+		stupid_sleep(m->sim->time_to_eat);
+		drop_forks(m);
 		println(m, "is sleeping\n");
 		stupid_sleep(m->sim->time_to_sleep);
 	}

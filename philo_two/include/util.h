@@ -10,22 +10,16 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <simulation.h>
-#include <stdio.h>
+#ifndef UTIL_H
+# define UTIL_H
 
-int		fake_trylock(t_threadmsg *m, int forkid)
-{
-	int	is_busy;
+unsigned long	get_time_ms(void);
+int				not_atoi(char *str, int *result);
+int				not_atoui(char *str, unsigned int *result);
+int				not_isdigit(char c);
+int				putstr_unlocked(char *str);
+unsigned long	get_time_us(void);
+char			*ft_strcpy(char *dst, const char *src);
+char			*ft_itoa(unsigned long n, char *out);
 
-	is_busy = 1;
-	dead_lock(m);
-	pthread_mutex_lock(&m->sim->forks[forkid]);
-	if (m->sim->thread_count == 1 || (m->sim->real_forks[forkid] < 0
-		&& m->sim->real_forks[forkid] != -m->id))
-	{
-		m->sim->real_forks[forkid] = m->id;
-		is_busy = 0;
-	}
-	pthread_mutex_unlock(&m->sim->forks[forkid]);
-	return (is_busy);
-}
+#endif

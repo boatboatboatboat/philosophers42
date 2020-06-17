@@ -11,21 +11,18 @@
 /* ************************************************************************** */
 
 #include <simulation.h>
-#include <stdio.h>
+#include <util.h>
 
-int		fake_trylock(t_threadmsg *m, int forkid)
+int		do_eat(
+		t_threadmsg *m,
+		unsigned long *last_meal)
 {
-	int	is_busy;
+	unsigned long	curtime;
 
-	is_busy = 1;
-	dead_lock(m);
-	pthread_mutex_lock(&m->sim->forks[forkid]);
-	if (m->sim->thread_count == 1 || (m->sim->real_forks[forkid] < 0
-		&& m->sim->real_forks[forkid] != -m->id))
-	{
-		m->sim->real_forks[forkid] = m->id;
-		is_busy = 0;
-	}
-	pthread_mutex_unlock(&m->sim->forks[forkid]);
-	return (is_busy);
+	println(m, "is eating\n");
+	*last_meal = get_time_ms();
+	curtime = get_time_ms();
+	while ((curtime - *last_meal) < m->sim->time_to_eat)
+		continue ;
+	return (0);
 }
