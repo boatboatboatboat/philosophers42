@@ -10,15 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <simulation.h>
-#include <stdio.h>
-
-int		fake_trylock(t_threadmsg *m, int forkid)
+int	not_isdigit(char c)
 {
-	int	is_busy;
-
-	(void)m;
-	(void)forkid;
-	is_busy = 1;
-	return (is_busy);
+	return (c >= '0' && c <= '9');
 }

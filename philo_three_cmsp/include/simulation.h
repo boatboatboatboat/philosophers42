@@ -23,7 +23,9 @@ typedef struct		s_simulation
 	sem_t			*writer_lock;
 	sem_t			*killed_lock;
 	sem_t			*dead_lock;
+	sem_t			*failure_lock;
 	sem_t			*forks;
+	pid_t			*children;
 	int				thread_count;
 	int				meals_required;
 	int				killed;
@@ -39,7 +41,8 @@ typedef struct		s_threadmsg
 	int				id;
 	int				meals;
 	unsigned long	last_meal;
-	sem_t			*meal_lock;
+	sem_t			*meals_completed_sem;
+	sem_t			*died_sem;
 }					t_threadmsg;
 
 int					parse_arguments(
@@ -68,5 +71,6 @@ int					take_fork(
 		t_threadmsg *m);
 void				dead_lock(t_threadmsg *m);
 void				unlink_semaphores(void);
+void				kill_em_all(t_simulation *sim, int c);
 
 #endif

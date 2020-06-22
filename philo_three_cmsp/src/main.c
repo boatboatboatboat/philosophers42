@@ -11,14 +11,20 @@
 /* ************************************************************************** */
 
 #include <simulation.h>
-#include <stdio.h>
+#include <util.h>
+#include <stdlib.h>
 
-int		fake_trylock(t_threadmsg *m, int forkid)
+int		main(
+	int argc,
+	char **argv)
 {
-	int	is_busy;
+	t_simulation	*sim;
 
-	(void)m;
-	(void)forkid;
-	is_busy = 1;
-	return (is_busy);
+	sim = malloc(sizeof(t_simulation));
+	if (parse_arguments(sim, argc - 1, argv + 1) != 0)
+		return (putstr_unlocked("bad arguments\n"));
+	if (sim->thread_count == 0)
+		return (putstr_unlocked("there should be at least 1 philosopher\n"));
+	(void)start_simulation(sim);
+	return (0);
 }

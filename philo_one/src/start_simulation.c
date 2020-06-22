@@ -43,7 +43,6 @@ void		run_simulation(t_simulation *sim, t_threadmsg *msg)
 {
 	unsigned long	i[2];
 
-	pthread_mutex_lock(&sim->dead_lock);
 	while (1)
 	{
 		pthread_mutex_lock(&sim->killed_lock);

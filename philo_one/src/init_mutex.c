@@ -28,6 +28,7 @@ int		init_stack_mutex(t_simulation *sim)
 		pthread_mutex_destroy(&sim->killed_lock);
 		return (1);
 	}
+	pthread_mutex_lock(&sim->dead_lock);
 	return (0);
 }
 

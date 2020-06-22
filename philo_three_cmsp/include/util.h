@@ -10,15 +10,16 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <simulation.h>
-#include <stdio.h>
+#ifndef UTIL_H
+# define UTIL_H
 
-int		fake_trylock(t_threadmsg *m, int forkid)
-{
-	int	is_busy;
+unsigned long	get_time_ms(void);
+int				not_atoi(char *str, int *result);
+int				not_atoui(char *str, unsigned int *result);
+int				not_isdigit(char c);
+int				putstr_unlocked(char *str);
+unsigned long	get_time_us(void);
+char			*ft_strcpy(char *dst, const char *src);
+char			*ft_itoa(unsigned long n, char *out);
 
-	(void)m;
-	(void)forkid;
-	is_busy = 1;
-	return (is_busy);
-}
+#endif

@@ -14,6 +14,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <util.h>
+#include <signal.h>
 
 static int	init_simulation(t_simulation *sim, t_threadmsg *tmsg)
 {
@@ -33,32 +34,65 @@ static int	init_simulation(t_simulation *sim, t_threadmsg *tmsg)
 	return (0);
 }
 
+void		death_event_handler(t_simulation *sim, t_threadmsg *msg)
+{
+	sem_wait(msg->died_sem);
+	sem_wait(msg->sim->killed_lock);
+	msg->sim->killed = 1;
+	sem_post(msg->sim->killed_lock);
+	exit(0);
+}
+
+void		mealcomplete_event_handler(t_simulation *sim, t_threadmsg *msg)
+{
+	int	i;
+
+	i = 0;
+	while (i < sim->thread_count)
+	{
+		sem_wait(msg[i].meals_completed_sem);
+		i += 1;
+	}
+	kill_em_all(sim, sim->thread_count);
+	exit(0);
+}
+
+void		start_philosopher(t_simulation *sim, t_threadmsg *msg)
+{
+	pthread_t	ihandler;
+
+	if (pthread_create(&ihandler, NULL, (void *(*)(void *)) ihandler, msg) != 0)
+		sem_post(sim->failure_lock);
+	else
+		philosopher(msg);
+	exit(0);
+}
+
+void		kill_em_all(t_simulation *sim, int c)
+{
+	while (c > 0)
+	{
+		c -= 1;
+		kill(sim->children[c], SIGKILL);
+	}
+}
+
 void		run_simulation(t_simulation *sim, t_threadmsg *msg)
 {
-	unsigned long	i[2];
+	int	i;
 
-	while (1)
+	i = 0;
+	while (i < sim->thread_count)
 	{
-		sem_wait(sim->killed_lock);
-		if (sim->killed)
-			break ;
-		sem_post(sim->killed_lock);
-		i[0] = 0;
-		i[1] = 0;
-		while (i[0] < (unsigned long)sim->thread_count)
+		sim->children[i] = fork();
+		if (sim->children[i] == 0)
+			start_philosopher(sim, msg + i);
+		else if (sim->children[i] < 0)
 		{
-			sem_wait(msg[i[0]].meal_lock);
-			i[1] += msg[i[0]].meals >= sim->meals_required;
-			sem_post(msg[i[0]].meal_lock);
-			i[0] += 1;
-		}
-		if (sim->meals_required >= 0
-			&& i[1] == (unsigned long)sim->thread_count)
-		{
-			sem_wait(sim->writer_lock);
+			kill_em_all(sim, i);
 			break ;
 		}
-		usleep(500);
+		i += 1;
 	}
 }
 
