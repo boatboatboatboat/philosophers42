@@ -11,14 +11,26 @@
 /* ************************************************************************** */
 
 #include <simulation.h>
-#include <stdio.h>
+#include <stdlib.h>
 
-int		fake_trylock(t_threadmsg *m, int forkid)
+void	unlink_semaphores(void)
 {
-	int	is_busy;
+	sem_unlink("/writerlock");
+	sem_unlink("/killerlock");
+	sem_unlink("/deadlock");
+}
 
-	(void)m;
-	(void)forkid;
-	is_busy = 1;
-	return (is_busy);
+int		init_stack_semaphores(t_simulation *sim)
+{
+	unlink_semaphores();
+	sim->writer_lock = sem_open("/writerlock", O_CREAT, S_IRWXU | S_IRWXO, 1);
+	sim->killed_lock = sem_open("/killerlock", O_CREAT, S_IRWXU | S_IRWXO, 1);
+	sim->dead_lock = sem_open("/deadlock", O_CREAT, S_IRWXU | S_IRWXO, 0);
+	if (sim->writer_lock == SEM_FAILED || sim->killed_lock == SEM_FAILED
+		|| sim->dead_lock == SEM_FAILED)
+	{
+		unlink_semaphores();
+		return (1);
+	}
+	return (0);
 }

@@ -11,14 +11,12 @@
 /* ************************************************************************** */
 
 #include <simulation.h>
-#include <stdio.h>
 
-int		fake_trylock(t_threadmsg *m, int forkid)
+int		hecking_die(t_threadmsg *m)
 {
-	int	is_busy;
-
-	(void)m;
-	(void)forkid;
-	is_busy = 1;
-	return (is_busy);
+	sem_wait(m->sim->killed_lock);
+	m->sim->killed = 1;
+	sem_post(m->sim->writer_lock);
+	println_nd(m, "died\n");
+	return (1);
 }

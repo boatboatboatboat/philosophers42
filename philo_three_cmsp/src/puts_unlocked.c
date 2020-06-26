@@ -10,15 +10,18 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <simulation.h>
-#include <stdio.h>
+#include <unistd.h>
 
-int		fake_trylock(t_threadmsg *m, int forkid)
+int	putstr_unlocked(char *str)
 {
-	int	is_busy;
+	int	len;
+	int	tot;
 
-	(void)m;
-	(void)forkid;
-	is_busy = 1;
-	return (is_busy);
+	len = 0;
+	tot = 0;
+	while (str[len] != '\0')
+		len += 1;
+	while (tot != len)
+		tot += write(1, str + tot, len - tot);
+	return (0);
 }

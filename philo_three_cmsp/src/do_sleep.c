@@ -11,14 +11,23 @@
 /* ************************************************************************** */
 
 #include <simulation.h>
-#include <stdio.h>
+#include <util.h>
 
-int		fake_trylock(t_threadmsg *m, int forkid)
+int		do_sleep(
+		t_threadmsg *m,
+		unsigned long last_meal)
 {
-	int	is_busy;
+	unsigned long	curtime;
+	unsigned long	sleepstart;
 
-	(void)m;
-	(void)forkid;
-	is_busy = 1;
-	return (is_busy);
+	println(m, "is sleeping\n");
+	curtime = get_time_ms();
+	sleepstart = get_time_ms();
+	while ((curtime - sleepstart) < m->sim->time_to_sleep)
+	{
+		if ((curtime - last_meal) >= m->sim->time_to_die)
+			return (hecking_die(m));
+		curtime = get_time_ms();
+	}
+	return (0);
 }

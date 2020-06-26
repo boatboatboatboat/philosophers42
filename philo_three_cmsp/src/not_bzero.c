@@ -10,15 +10,12 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <simulation.h>
-#include <stdio.h>
-
-int		fake_trylock(t_threadmsg *m, int forkid)
+int		not_bzero(int *a, int l)
 {
-	int	is_busy;
-
-	(void)m;
-	(void)forkid;
-	is_busy = 1;
-	return (is_busy);
+	while (l > 0)
+	{
+		l -= 1;
+		a[l] = -(l - (l % 2) + 1);
+	}
+	return (0);
 }

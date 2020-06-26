@@ -11,14 +11,11 @@
 /* ************************************************************************** */
 
 #include <simulation.h>
-#include <stdio.h>
 
-int		fake_trylock(t_threadmsg *m, int forkid)
+void	drop_forks(t_threadmsg *m)
 {
-	int	is_busy;
-
-	(void)m;
-	(void)forkid;
-	is_busy = 1;
-	return (is_busy);
+	dead_lock(m);
+	sem_post(m->sim->forks);
+	sem_post(m->sim->forks);
+	dead_lock(m);
 }
