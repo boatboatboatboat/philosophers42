@@ -10,28 +10,24 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <simulation.h>
-#include <stdlib.h>
-#include <fcntl.h>
+#include <unistd.h>
 
-void	unlink_semaphores(void)
+int	putstr_unlocked(int fd, const char *str)
 {
-	sem_unlink("/writerlock");
-	sem_unlink("/killerlock");
-	sem_unlink("/deadlock");
-}
+	int	len;
+	int	tot;
+	int	res;
 
-int		init_stack_semaphores(t_simulation *sim)
-{
-	unlink_semaphores();
-	sim->writer_lock = sem_open("/writerlock", O_CREAT, S_IRWXU | S_IRWXO, 1);
-	sim->killed_lock = sem_open("/killerlock", O_CREAT, S_IRWXU | S_IRWXO, 1);
-	sim->dead_lock = sem_open("/deadlock", O_CREAT, S_IRWXU | S_IRWXO, 0);
-	if (sim->writer_lock == SEM_FAILED || sim->killed_lock == SEM_FAILED
-		|| sim->dead_lock == SEM_FAILED)
+	len = 0;
+	tot = 0;
+	while (str[len] != '\0')
+		len += 1;
+	while (tot != len)
 	{
-		unlink_semaphores();
-		return (1);
+		res = write(fd, str + tot, len - tot);
+		if (res == -1)
+			continue ;
+		tot += res;
 	}
 	return (0);
 }

@@ -13,6 +13,7 @@
 #include <simulation.h>
 #include <util.h>
 #include <stdlib.h>
+#include <fcntl.h>
 
 static int	init_messages(t_simulation *sim, t_threadmsg *msg)
 {

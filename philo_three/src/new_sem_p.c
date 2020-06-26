@@ -11,27 +11,15 @@
 /* ************************************************************************** */
 
 #include <simulation.h>
-#include <stdlib.h>
 #include <fcntl.h>
 
-void	unlink_semaphores(void)
+sem_t	*new_sem_p(const char *name, int value)
 {
-	sem_unlink("/writerlock");
-	sem_unlink("/killerlock");
-	sem_unlink("/deadlock");
-}
+	sem_t	*new_semaphore;
 
-int		init_stack_semaphores(t_simulation *sim)
-{
-	unlink_semaphores();
-	sim->writer_lock = sem_open("/writerlock", O_CREAT, S_IRWXU | S_IRWXO, 1);
-	sim->killed_lock = sem_open("/killerlock", O_CREAT, S_IRWXU | S_IRWXO, 1);
-	sim->dead_lock = sem_open("/deadlock", O_CREAT, S_IRWXU | S_IRWXO, 0);
-	if (sim->writer_lock == SEM_FAILED || sim->killed_lock == SEM_FAILED
-		|| sim->dead_lock == SEM_FAILED)
-	{
-		unlink_semaphores();
-		return (1);
-	}
-	return (0);
+	sem_unlink(name);
+	new_semaphore = sem_open(name, O_CREAT, S_IRWXU | S_IRWXO, value);
+	if (new_semaphore == SEM_FAILED)
+		throw_fatal("failed to create semaphore");
+	return (new_semaphore);
 }

@@ -11,27 +11,19 @@
 /* ************************************************************************** */
 
 #include <simulation.h>
+#include <util.h>
 #include <stdlib.h>
-#include <fcntl.h>
 
-void	unlink_semaphores(void)
-{
-	sem_unlink("/writerlock");
-	sem_unlink("/killerlock");
-	sem_unlink("/deadlock");
-}
+t_simulation	g_sim;
 
-int		init_stack_semaphores(t_simulation *sim)
+int		main(
+	int argc,
+	char **argv)
 {
-	unlink_semaphores();
-	sim->writer_lock = sem_open("/writerlock", O_CREAT, S_IRWXU | S_IRWXO, 1);
-	sim->killed_lock = sem_open("/killerlock", O_CREAT, S_IRWXU | S_IRWXO, 1);
-	sim->dead_lock = sem_open("/deadlock", O_CREAT, S_IRWXU | S_IRWXO, 0);
-	if (sim->writer_lock == SEM_FAILED || sim->killed_lock == SEM_FAILED
-		|| sim->dead_lock == SEM_FAILED)
-	{
-		unlink_semaphores();
-		return (1);
-	}
+	if (parse_arguments(&g_sim, argc - 1, argv + 1) != 0)
+		return (throw_fatal("bad arguments"));
+	if (g_sim.thread_count == 0)
+		return (throw_fatal("there should be at least 1 philosopher\n"));
+	simulate(&g_sim);
 	return (0);
 }

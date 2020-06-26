@@ -10,28 +10,29 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <simulation.h>
-#include <stdlib.h>
-#include <fcntl.h>
+#include <sys/time.h>
+#include <stddef.h>
 
-void	unlink_semaphores(void)
+unsigned long	get_time_ms(void)
 {
-	sem_unlink("/writerlock");
-	sem_unlink("/killerlock");
-	sem_unlink("/deadlock");
+	struct timeval	tv;
+	unsigned long	out;
+
+	gettimeofday(&tv, NULL);
+	out = tv.tv_sec;
+	out *= 1000;
+	out += (tv.tv_usec / 1000);
+	return (out);
 }
 
-int		init_stack_semaphores(t_simulation *sim)
+unsigned long	get_time_us(void)
 {
-	unlink_semaphores();
-	sim->writer_lock = sem_open("/writerlock", O_CREAT, S_IRWXU | S_IRWXO, 1);
-	sim->killed_lock = sem_open("/killerlock", O_CREAT, S_IRWXU | S_IRWXO, 1);
-	sim->dead_lock = sem_open("/deadlock", O_CREAT, S_IRWXU | S_IRWXO, 0);
-	if (sim->writer_lock == SEM_FAILED || sim->killed_lock == SEM_FAILED
-		|| sim->dead_lock == SEM_FAILED)
-	{
-		unlink_semaphores();
-		return (1);
-	}
-	return (0);
+	struct timeval	tv;
+	unsigned long	out;
+
+	gettimeofday(&tv, NULL);
+	out = tv.tv_sec;
+	out *= 1000 * 1000;
+	out += tv.tv_usec;
+	return (out);
 }

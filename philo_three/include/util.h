@@ -10,28 +10,15 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <simulation.h>
-#include <stdlib.h>
-#include <fcntl.h>
+#ifndef UTIL_H
+# define UTIL_H
 
-void	unlink_semaphores(void)
-{
-	sem_unlink("/writerlock");
-	sem_unlink("/killerlock");
-	sem_unlink("/deadlock");
-}
+unsigned long	get_time_ms(void);
+int				not_atoi(char *str, int *result);
+int				not_atoui(char *str, unsigned int *result);
+int				not_isdigit(char c);
+unsigned long	get_time_us(void);
+char			*ft_strcpy(char *dst, const char *src);
+char			*ft_itoa(unsigned long n, char *out);
 
-int		init_stack_semaphores(t_simulation *sim)
-{
-	unlink_semaphores();
-	sim->writer_lock = sem_open("/writerlock", O_CREAT, S_IRWXU | S_IRWXO, 1);
-	sim->killed_lock = sem_open("/killerlock", O_CREAT, S_IRWXU | S_IRWXO, 1);
-	sim->dead_lock = sem_open("/deadlock", O_CREAT, S_IRWXU | S_IRWXO, 0);
-	if (sim->writer_lock == SEM_FAILED || sim->killed_lock == SEM_FAILED
-		|| sim->dead_lock == SEM_FAILED)
-	{
-		unlink_semaphores();
-		return (1);
-	}
-	return (0);
-}
+#endif

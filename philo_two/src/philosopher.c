@@ -39,11 +39,8 @@ void		dead_lock(t_threadmsg *m)
 
 void		*philosopher(t_threadmsg *m)
 {
-	int				forkset[2];
 	unsigned long	last_meal;
 
-	forkset[0] = m->id == 1 ? 1 : m->id - 1;
-	forkset[1] = m->id == 1 ? 0 : m->id % m->sim->thread_count;
 	usleep((m->id % 2) * 100);
 	while (1)
 	{

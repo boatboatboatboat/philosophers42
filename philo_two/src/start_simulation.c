@@ -14,25 +14,21 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <util.h>
+#include <fcntl.h>
 
 static int	init_simulation(t_simulation *sim, t_threadmsg *tmsg)
 {
 	sim->starttime = get_time_ms();
 	sem_unlink("/philoforks");
-	sim->forks = sem_open("/philoforks", O_CREAT | O_TRUNC, S_IRWXU | S_IRWXO, sim->thread_count);
+	sim->forks = sem_open("/philoforks", O_CREAT | O_TRUNC, S_IRWXU | S_IRWXO,
+			sim->thread_count + (sim->thread_count == 1));
 	if (sim->forks == NULL)
 		return (putstr_unlocked("failed to create forks\n"));
-	/*if (init_mutex(sim) != 0)
-		return (putstr_unlocked("mutex creation failed\n"));*/
-	if (init_stack_mutex(sim) != 0)
-	{
-		/*destroy_mutex(sim);*/
+	if (init_stack_semaphores(sim) != 0)
 		return (putstr_unlocked("stack mutex creation failed\n"));
-	}
 	if (init_threads(sim, tmsg) != 0)
 	{
-		/* Destroy Semaphores! */
-		/* destroy_mutex(sim); */
+		unlink_semaphores();
 		return (putstr_unlocked("thread init failed\n"));
 	}
 	return (0);
@@ -110,7 +106,7 @@ int			start_simulation(t_simulation *sim)
 	if (init_simulation(sim, tmsg) != 0)
 	{
 		free(tmsg);
-		/* free(sim->real_forks); dtor sem */
+		unlink_semaphores();
 		return (1);
 	}
 	sim->killed = 0;
