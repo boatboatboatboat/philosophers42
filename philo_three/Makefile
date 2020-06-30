@@ -28,6 +28,13 @@ SRC_FILES =	main \
 			throw_fatal \
 			new_sem_p \
 			gettime \
+			check_death \
+			check_failure \
+			check_meal_completion \
+			philosopher_check_death \
+			philosopher_core \
+			philosopher_main \
+			spawn_child \
 			init_simulation
 
 SRC_FILES := $(SRC_FILES:%=%.o)
@@ -53,7 +60,7 @@ re: fclean
 
 bonus: all
 
-debug: FLAGS_RELEASE = -Wall -Wextra -Werror -g -pedantic -lpthread -fsanitize=address
+debug: FLAGS_RELEASE = -Wall -Wextra -Werror -O3 -pedantic -lpthread #-fsanitize=address
 debug: all
 
 rdb: fclean

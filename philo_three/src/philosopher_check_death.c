@@ -10,7 +10,22 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-int	not_isdigit(char c)
+#include <simulation.h>
+#include <util.h>
+
+void	*philosopher_check_death(t_threadmsg *msg)
 {
-	return (c >= '0' && c <= '9');
+	while (1)
+	{
+		sem_wait(msg->sim->lastmeal_locks[msg->id - 1]);
+		if ((get_time_ms() - msg->last_meal) >= msg->sim->time_to_die)
+		{
+			sem_post(msg->sim->lastmeal_locks[msg->id - 1]);
+			println_nd(msg, "died\n");
+			sem_post(msg->sim->death_lock);
+			return (NULL);
+		}
+		sem_post(msg->sim->lastmeal_locks[msg->id - 1]);
+		usleep(100);
+	}
 }

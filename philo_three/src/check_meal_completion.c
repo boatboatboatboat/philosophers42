@@ -11,18 +11,21 @@
 /* ************************************************************************** */
 
 #include <simulation.h>
-#include <util.h>
+#include <stdlib.h>
 
-int		do_eat(
-		t_threadmsg *m,
-		unsigned long *last_meal)
+void	*check_meal_completion(void *simv)
 {
-	unsigned long	curtime;
+	t_simulation	*sim;
+	int				idx;
 
-	println(m, "is eating\n");
-	*last_meal = get_time_ms();
-	curtime = get_time_ms();
-	while ((curtime - *last_meal) < m->sim->time_to_eat)
-		continue ;
-	return (0);
+	idx = 0;
+	sim = simv;
+	while (idx < sim->thread_count)
+	{
+		sem_wait(sim->meal_completion_sem[idx]);
+		idx += 1;
+	}
+	usleep(500);
+	kill_all_children(sim->child_processes, idx);
+	exit(EXIT_SUCCESS);
 }

@@ -10,12 +10,16 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-int		not_bzero(int *a, int l)
+#include <simulation.h>
+#include <stdlib.h>
+
+void	*check_death(void *simv)
 {
-	while (l > 0)
-	{
-		l -= 1;
-		a[l] = -(l - (l % 2) + 1);
-	}
-	return (0);
+	t_simulation	*sim;
+
+	sim = simv;
+	sem_wait(sim->death_lock);
+	usleep(500);
+	kill_all_children(sim->child_processes, sim->thread_count);
+	exit(EXIT_SUCCESS);
 }

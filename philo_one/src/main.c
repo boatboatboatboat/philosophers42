@@ -21,6 +21,8 @@ int		main(
 	t_simulation	*sim;
 
 	sim = malloc(sizeof(t_simulation));
+	if (sim == NULL)
+		return (putstr_unlocked("nice alloc\n"));
 	if (parse_arguments(sim, argc - 1, argv + 1) != 0)
 		return (putstr_unlocked("bad arguments\n"));
 	if (sim->thread_count == 0)

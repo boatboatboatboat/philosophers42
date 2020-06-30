@@ -51,8 +51,7 @@ int					init_mutex(t_simulation *sim);
 int					init_stack_semaphores(t_simulation *sim);
 void				destroy_mutex(t_simulation *sim);
 int					init_threads(t_simulation *sim, t_threadmsg *msg);
-
-_Noreturn void				*philosopher(t_threadmsg *info);
+void				*philosopher(t_threadmsg *info);
 void				println(t_threadmsg *msg, char *str);
 void				println_nd(t_threadmsg *msg, char *str);
 int					not_bzero(int *a, int l);

@@ -108,7 +108,8 @@ int			start_simulation(t_simulation *sim)
 	t_threadmsg	*tmsg;
 
 	tmsg = malloc(sizeof(t_threadmsg) * sim->thread_count);
-	if (init_simulation(sim, tmsg) != 0)
+	sim->real_forks = NULL;
+	if (tmsg == NULL || init_simulation(sim, tmsg) != 0)
 	{
 		free(tmsg);
 		free(sim->real_forks);

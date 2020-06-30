@@ -41,7 +41,7 @@ void		*philosopher(t_threadmsg *m)
 {
 	unsigned long	last_meal;
 
-	usleep((m->id % 2) * 100);
+	usleep((m->id % 2) * 500);
 	while (1)
 	{
 		println(m, "is thinking\n");
@@ -54,8 +54,8 @@ void		*philosopher(t_threadmsg *m)
 		sem_wait(m->meal_lock);
 		m->last_meal = last_meal;
 		m->meals += 1;
-		dead_lock(m);
 		sem_post(m->meal_lock);
+		dead_lock(m);
 		stupid_sleep(m->sim->time_to_eat);
 		drop_forks(m);
 		println(m, "is sleeping\n");

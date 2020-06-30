@@ -1,3 +1,0 @@
-/home/boat/codam/philosophers/philo_one/cmake-build-debug/CMakeFiles/rebuild_cache.dir
-/home/boat/codam/philosophers/philo_one/cmake-build-debug/CMakeFiles/edit_cache.dir
-/home/boat/codam/philosophers/philo_one/cmake-build-debug/CMakeFiles/philo_one_cmake.dir

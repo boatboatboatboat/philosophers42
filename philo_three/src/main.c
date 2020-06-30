@@ -14,16 +14,16 @@
 #include <util.h>
 #include <stdlib.h>
 
-t_simulation	g_sim;
-
 int		main(
 	int argc,
 	char **argv)
 {
-	if (parse_arguments(&g_sim, argc - 1, argv + 1) != 0)
+	t_simulation	sim;
+
+	if (parse_arguments(&sim, argc - 1, argv + 1) != 0)
 		return (throw_fatal("bad arguments"));
-	if (g_sim.thread_count == 0)
-		return (throw_fatal("there should be at least 1 philosopher\n"));
-	simulate(&g_sim);
+	if (sim.thread_count == 0)
+		return (throw_fatal("there should be at least 1 philosopher"));
+	simulate(&sim);
 	return (0);
 }

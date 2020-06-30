@@ -13,7 +13,7 @@
 #include <simulation.h>
 #include <stdlib.h>
 
-int		throw_fatal(const char* s)
+int		throw_fatal(const char *s)
 {
 	putstr_unlocked(STDERR_FILENO, "error: ");
 	putstr_unlocked(STDERR_FILENO, s);

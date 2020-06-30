@@ -60,7 +60,7 @@ re: fclean
 
 bonus: all
 
-debug: FLAGS_RELEASE = -Wall -Wextra -Werror -g -pedantic -lpthread -fsanitize=address
+debug: FLAGS_RELEASE = -Wall -Wextra -Werror -O3 -g -pedantic -lpthread # -fsanitize=address
 debug: all
 
 rdb: fclean

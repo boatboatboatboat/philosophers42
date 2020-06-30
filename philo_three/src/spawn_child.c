@@ -10,29 +10,45 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <sys/time.h>
-#include <stddef.h>
+#include <unistd.h>
+#include <simulation.h>
+#include <signal.h>
 
-unsigned long	get_time_ms(void)
+int		spawn_child(pid_t *pid, t_threadmsg *msg)
 {
-	struct timeval	tv;
-	unsigned long	out;
-
-	gettimeofday(&tv, NULL);
-	out = tv.tv_sec;
-	out *= 1000;
-	out += (tv.tv_usec / 1000);
-	return (out);
+	*pid = fork();
+	if (*pid == 0)
+		philosopher_main(msg);
+	else if (*pid == -1)
+		return (-1);
+	return (0);
 }
 
-unsigned long	get_time_us(void)
+void	kill_all_children(pid_t *children, int count)
 {
-	struct timeval	tv;
-	unsigned long	out;
+	while (count > 0)
+	{
+		count -= 1;
+		kill(children[count], SIGKILL);
+	}
+}
 
-	gettimeofday(&tv, NULL);
-	out = tv.tv_sec;
-	out *= 1000 * 1000;
-	out += tv.tv_usec;
-	return (out);
+void	spawn_children(t_simulation *sim)
+{
+	int			idx;
+	t_threadmsg	msg;
+
+	idx = 0;
+	msg.sim = sim;
+	while (idx < sim->thread_count)
+	{
+		msg.id = idx + 1;
+		msg.meals = 0;
+		if (spawn_child(sim->child_processes + idx, &msg) == -1)
+		{
+			kill_all_children(sim->child_processes, idx);
+			throw_fatal("failed to spawn children");
+		}
+		idx += 1;
+	}
 }

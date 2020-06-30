@@ -10,16 +10,22 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef UTIL_H
-# define UTIL_H
+#include <simulation.h>
+#include <pthread.h>
+#include <util.h>
 
-unsigned long	get_time_ms(void);
-int				not_atoi(char *str, int *result);
-int				not_atoui(char *str, unsigned int *result);
-int				not_isdigit(char c);
-int				putstr_unlocked(char *str);
-unsigned long	get_time_us(void);
-char			*ft_strcpy(char *dst, const char *src);
-char			*ft_itoa(unsigned long n, char *out);
+void	philosopher_main(t_threadmsg *msg)
+{
+	pthread_t	dh;
 
-#endif
+	sem_wait(msg->sim->start_barrier_sem);
+	msg->last_meal = get_time_ms();
+	if (pthread_create(&dh, NULL, (void *(*)(void *))&philosopher_check_death,
+			msg) != 0)
+	{
+		sem_post(msg->sim->failure_lock);
+		while (1)
+			continue ;
+	}
+	philosopher_core(msg);
+}

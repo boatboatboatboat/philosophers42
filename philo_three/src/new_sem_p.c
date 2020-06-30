@@ -12,6 +12,7 @@
 
 #include <simulation.h>
 #include <fcntl.h>
+#include <stdio.h>
 
 sem_t	*new_sem_p(const char *name, int value)
 {

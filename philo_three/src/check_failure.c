@@ -10,18 +10,16 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <unistd.h>
+#include <simulation.h>
+#include <stdlib.h>
 
-int	putstr_unlocked(char *str)
+void	*check_failure(void *simv)
 {
-	int	len;
-	int	tot;
+	t_simulation	*sim;
 
-	len = 0;
-	tot = 0;
-	while (str[len] != '\0')
-		len += 1;
-	while (tot != len)
-		tot += write(1, str + tot, len - tot);
-	return (0);
+	sim = simv;
+	sem_wait(sim->failure_lock);
+	usleep(500);
+	kill_all_children(sim->child_processes, sim->thread_count);
+	exit(EXIT_FAILURE);
 }

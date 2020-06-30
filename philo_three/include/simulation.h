@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef SIMUALTION_H
+#ifndef SIMULATION_H
 # define SIMULATION_H
 
 # include <semaphore.h>
@@ -21,6 +21,7 @@
 # define FAILURE_LN "/p3failurelock"
 # define MEAL_COMPLETE_SN "/p3mc"
 # define LASTMEAL_SN "/p3lm"
+# define PDEAD_SN "/p3pd"
 # define BARRIER_SN "/p3barrier"
 # define FORKS_SN "/p3forks"
 
@@ -32,6 +33,7 @@ typedef struct	s_simulation
 	sem_t			*start_barrier_sem;
 	sem_t			**meal_completion_sem;
 	sem_t			**lastmeal_locks;
+	sem_t			**pdead_locks;
 	sem_t			*forks_sem;
 	pid_t			*child_processes;
 	int				thread_count;
@@ -49,20 +51,25 @@ typedef struct	s_threadmsg {
 	unsigned long	last_meal;
 }				t_threadmsg;
 
-int		throw_fatal(const char* s);
-int		putstr_unlocked(int fd, const char *str);
-void	*alloc_p(size_t count, size_t type_size);
-sem_t	*new_sem_p(const char *name, int value);
-void	philosopher_main(t_threadmsg *message);
-void	kill_all_children(pid_t *children, int count);
-void	println_nd(t_threadmsg *msg, char *str);
-void	println(t_threadmsg *msg, char *str);
-int		parse_arguments(
-		t_simulation *sim,
-		int argc,
-		char **argv);
-void	simulate(t_simulation *sim);
-
-extern t_simulation	g_sim;
+int				throw_fatal(const char *s);
+int				putstr_unlocked(int fd, const char *str);
+void			*alloc_p(size_t count, size_t type_size);
+sem_t			*new_sem_p(const char *name, int value);
+void			philosopher_main(t_threadmsg *message);
+void			kill_all_children(pid_t *children, int count);
+void			println_nd(t_threadmsg *msg, char *str);
+void			println(t_threadmsg *msg, char *str);
+int				parse_arguments(
+				t_simulation *sim,
+				int argc,
+				char **argv);
+void			simulate(t_simulation *sim);
+void			*philosopher_check_death(t_threadmsg *msg);
+void			philosopher_core(t_threadmsg *msg);
+void			philosopher_main(t_threadmsg *msg);
+void			*check_death(void *simv);
+void			*check_failure(void *simv);
+void			*check_meal_completion(void *simv);
+void			spawn_children(t_simulation *sim);
 
 #endif

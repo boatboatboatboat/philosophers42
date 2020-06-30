@@ -103,7 +103,7 @@ int			start_simulation(t_simulation *sim)
 	t_threadmsg	*tmsg;
 
 	tmsg = malloc(sizeof(t_threadmsg) * sim->thread_count);
-	if (init_simulation(sim, tmsg) != 0)
+	if (tmsg == NULL || init_simulation(sim, tmsg) != 0)
 	{
 		free(tmsg);
 		unlink_semaphores();
@@ -113,5 +113,7 @@ int			start_simulation(t_simulation *sim)
 	start_ihandlers(tmsg);
 	run_simulation(sim, tmsg);
 	usleep(1010);
+	free(tmsg);
+	unlink_semaphores();
 	return (0);
 }
